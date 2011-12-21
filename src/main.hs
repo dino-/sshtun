@@ -8,16 +8,8 @@ import Network.Curl
 import System.IO
 import System.Process
 
-
-data TunnelState
-   = Running ProcessHandle
-   | Stopped
-
-data DesiredState
-   = Run | Stop
-   deriving Show
-
-type Shared = (TunnelState, DesiredState)
+import Sshtun.Common
+import Sshtun.Tunnel
 
 
 main :: IO ()
@@ -70,32 +62,3 @@ switch shared Stop = do
 stop :: TunnelState -> IO ()
 stop (Running ph) = terminateProcess ph
 stop Stopped      = return ()
-
-
-tunnelManager :: TVar Shared -> IO ()
-tunnelManager shared = do
-   state <- atomically . readTVar $ shared
-
-   case state of
-      (Stopped, Run) -> do
-         -- Tunnel is stopped, but we'd like it to be started
-         putStrLn "Starting tunnel now"
-         ph <- runCommand "ssh -p 22 -N -R 2022:localhost:22 dino@ui3.info"
-         atomically $ writeTVar shared (Running ph, Run)
-
-         -- Then, we wait. Possibly for a long time
-         _ <- waitForProcess ph
-
-         -- Tunnel has (possibly unexpectedly) stopped, make a note of this
-         putStrLn "tunnelManager unblocked"
-         -- Read this again, may have changed during long wait
-         (_, dst) <- atomically . readTVar $ shared
-         atomically $ writeTVar shared (Stopped, dst)
-      _ -> return ()
-
-   sleep 10
-   tunnelManager shared
-
-
-sleep :: Int -> IO ()
-sleep = threadDelay . (*) 1000000
