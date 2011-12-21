@@ -39,7 +39,7 @@ switchWatcher shared = do
    switch shared $ evalSwitch swState
 
    putStrLn "switchWatcher starting to wait now"
-   milliSleep 20000
+   sleep 20
    putStrLn "switchWatcher done waiting"
    switchWatcher shared
 
@@ -93,9 +93,9 @@ tunnelManager shared = do
          atomically $ writeTVar shared (Stopped, dst)
       _ -> return ()
 
-   milliSleep 10000
+   sleep 10
    tunnelManager shared
 
 
-milliSleep :: Int -> IO ()
-milliSleep = threadDelay . (*) 1000
+sleep :: Int -> IO ()
+sleep = threadDelay . (*) 1000000
