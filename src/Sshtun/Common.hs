@@ -13,9 +13,7 @@ data TunnelState
    = Running ProcessHandle
    | Stopped
 
-data DesiredState
-   = Run | Stop
-   deriving Show
+data DesiredState = Run | Stop
 
 type Shared = (TunnelState, DesiredState)
 
