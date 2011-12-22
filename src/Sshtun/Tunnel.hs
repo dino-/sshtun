@@ -3,25 +3,48 @@
 -- Author: Dino Morelli <dino@ui3.info>
 
 module Sshtun.Tunnel
-   ( tunnelManager
+   ( tunnelStart
    )
    where
 
 import Control.Concurrent.STM
 import System.Process
+import Text.Printf
 
 import Sshtun.Common
+import Sshtun.Conf
 
 
-tunnelManager :: TVar Shared -> IO ()
-tunnelManager shared = do
+{- This is an ugly hack to delay things until after switchWatcher 
+   reads the flag status
+-}
+tunnelStart :: ConfMap -> TVar Shared -> IO ()
+tunnelStart c s = sleep 5 >> tunnelManager c s
+
+
+{- This is the tunnel managing loop, tries to keep it running,
+   if desired
+-}
+tunnelManager :: ConfMap -> TVar Shared -> IO ()
+tunnelManager conf shared = do
+   putStrLn "tunnelManager entered"
+
    state <- atomically . readTVar $ shared
 
    case state of
       (Stopped, Run) -> do
          -- Tunnel is stopped, but we'd like it to be started
+
+         -- Get various values from conf for the tunnel
+         sshPort <- confInt "sshPort" conf
+         remotePort <- confInt "remotePort" conf
+         localPort <- confInt "localPort" conf
+         remoteUser <- confString "remoteUser" conf
+         remoteHost <- confString "remoteHost" conf
+
          putStrLn "Starting tunnel now"
-         ph <- runCommand "ssh -p 22 -N -R 2022:localhost:22 dino@ui3.info"
+         ph <- runCommand $ printf "ssh -p %d -N -R %d:localhost:%d %s@%s"
+            sshPort remotePort localPort remoteUser remoteHost
          atomically $ writeTVar shared (Running ph, Run)
 
          -- Then, we wait. Possibly for a long time
@@ -34,5 +57,5 @@ tunnelManager shared = do
          atomically $ writeTVar shared (Stopped, dst)
       _ -> return ()
 
-   sleep 10
-   tunnelManager shared
+   confInt "tunnelRetryDelay" conf >>= sleep
+   tunnelManager conf shared

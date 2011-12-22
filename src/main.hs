@@ -7,6 +7,7 @@ import Control.Concurrent.STM
 import System.IO
 
 import Sshtun.Common
+import Sshtun.Conf
 import Sshtun.Switch
 import Sshtun.Tunnel
 
@@ -15,10 +16,8 @@ main :: IO ()
 main = do
    hSetBuffering stdout NoBuffering
 
-   shared <- atomically $ newTVar initState
-   _ <- forkIO $ tunnelManager shared
-   switchWatcher shared
+   conf <- fmap parseToMap $ readFile "/etc/sshtun.conf"
 
-
-initState :: Shared
-initState = (Stopped, Stop)
+   shared <- atomically $ newTVar (Stopped, Stop)
+   _ <- forkIO $ tunnelStart conf shared
+   switchWatcher conf shared

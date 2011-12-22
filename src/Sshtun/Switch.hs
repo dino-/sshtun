@@ -12,22 +12,24 @@ import Network.Curl
 import System.Process
 
 import Sshtun.Common
+import Sshtun.Conf
 
 
-switchWatcher :: TVar Shared -> IO ()
-switchWatcher shared = do
-   swState <- curlGetString "http://ui3.info/d/tflag" []
-   switch shared $ evalSwitch swState
+switchWatcher :: ConfMap -> TVar Shared -> IO ()
+switchWatcher conf shared = do
+   flagUrl <- confString "switchUrl" conf
+   body <- curlGetString flagUrl []
+   switch shared $ bodyToState body
 
    putStrLn "switchWatcher starting to wait now"
-   sleep 20
+   confInt "switchPollInterval" conf >>= sleep
    putStrLn "switchWatcher done waiting"
-   switchWatcher shared
+   switchWatcher conf shared
 
 
-evalSwitch :: (CurlCode, String) -> DesiredState
-evalSwitch (CurlOK, "1\n") = Run
-evalSwitch _               = Stop
+bodyToState :: (CurlCode, String) -> DesiredState
+bodyToState (CurlOK, "1\n") = Run
+bodyToState _               = Stop
 
 
 switch :: TVar Shared -> DesiredState -> IO ()

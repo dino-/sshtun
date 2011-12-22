@@ -22,7 +22,8 @@ tested-with:         GHC >= 7.0.3
 executable           sshtun
    main-is:          main.hs
    hs-source-dirs:   src
-   build-depends:    base >= 3 && < 5, curl, process, stm
+   build-depends:    base >= 3 && < 5, containers, curl, hslogger,
+                     process, regex-compat, stm
    ghc-options:      -Wall -threaded
 
 --test-suite           pristine-tests
