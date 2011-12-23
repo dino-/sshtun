@@ -8,6 +8,7 @@ import System.IO
 
 import Sshtun.Common
 import Sshtun.Conf
+import Sshtun.Log
 import Sshtun.Switch
 import Sshtun.Tunnel
 
@@ -18,6 +19,15 @@ main = do
 
    conf <- fmap parseToMap $ readFile "/etc/sshtun.conf"
 
+   logFile <- confString "logFile" conf
+   logPriority <- confPri "logPriority" conf
+   initLogging logFile logPriority
+
+   logM NOTICE "sshtun starting"
+   logTest
+
    shared <- atomically $ newTVar (Stopped, Stop)
    _ <- forkIO $ tunnelStart conf shared
    switchWatcher conf shared
+
+   logM NOTICE "sshtun stopping"

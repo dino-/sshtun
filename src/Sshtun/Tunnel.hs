@@ -13,6 +13,7 @@ import Text.Printf
 
 import Sshtun.Common
 import Sshtun.Conf
+import Sshtun.Log
 
 
 {- This is an ugly hack to delay things until after switchWatcher 
@@ -27,7 +28,7 @@ tunnelStart c s = sleep 5 >> tunnelManager c s
 -}
 tunnelManager :: ConfMap -> TVar Shared -> IO ()
 tunnelManager conf shared = do
-   putStrLn "tunnelManager entered"
+   logM DEBUG "tunnelManager entered"
 
    state <- atomically . readTVar $ shared
 
@@ -42,7 +43,7 @@ tunnelManager conf shared = do
          remoteUser <- confString "remoteUser" conf
          remoteHost <- confString "remoteHost" conf
 
-         putStrLn "Starting tunnel now"
+         logM INFO "Starting tunnel now"
          ph <- runCommand $ printf "ssh -p %d -N -R %d:localhost:%d %s@%s"
             sshPort remotePort localPort remoteUser remoteHost
          atomically $ writeTVar shared (Running ph, Run)
@@ -51,7 +52,7 @@ tunnelManager conf shared = do
          _ <- waitForProcess ph
 
          -- Tunnel has (possibly unexpectedly) stopped, make a note of this
-         putStrLn "tunnelManager unblocked"
+         logM INFO "tunnelManager unblocked"
          -- Read this again, may have changed during long wait
          (_, dst) <- atomically . readTVar $ shared
          atomically $ writeTVar shared (Stopped, dst)

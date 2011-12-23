@@ -13,6 +13,7 @@ import System.Process
 
 import Sshtun.Common
 import Sshtun.Conf
+import Sshtun.Log
 
 
 switchWatcher :: ConfMap -> TVar Shared -> IO ()
@@ -21,9 +22,9 @@ switchWatcher conf shared = do
    body <- curlGetString flagUrl []
    switch shared $ bodyToState body
 
-   putStrLn "switchWatcher starting to wait now"
+   logM INFO "switchWatcher starting to wait now"
    confInt "switchPollInterval" conf >>= sleep
-   putStrLn "switchWatcher done waiting"
+   logM INFO "switchWatcher done waiting"
    switchWatcher conf shared
 
 
@@ -35,13 +36,13 @@ bodyToState _               = Stop
 switch :: TVar Shared -> DesiredState -> IO ()
 
 switch shared Run = do
-   putStrLn "switch setting Run now"
+   logM INFO "switch setting Run now"
    atomically $ do
       (tst, _) <- readTVar shared
       writeTVar shared (tst, Run)
 
 switch shared Stop = do
-   putStrLn "switch setting Stop now"
+   logM INFO "switch setting Stop now"
    tst <- atomically $ do
       (tst, _) <- readTVar shared
       writeTVar shared (Stopped, Stop)
