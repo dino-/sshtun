@@ -4,6 +4,7 @@
 
 import Control.Concurrent
 import Control.Concurrent.STM
+import System.Exit
 import System.IO
 
 import Sshtun.Common
@@ -17,14 +18,21 @@ main :: IO ()
 main = do
    hSetBuffering stdout NoBuffering
 
-   conf <- fmap parseToMap $ readFile "/etc/sshtun.conf"
+   readFile "/etc/sshtun.conf" >>= parseConf >>=
+      either exitFail start
 
-   logFile <- confString "logFile" conf
-   logPriority <- confPri "logPriority" conf
-   initLogging logFile logPriority
+
+exitFail :: String -> IO ()
+exitFail msg = do
+   putStrLn msg
+   exitWith $ ExitFailure 1
+
+
+start :: Conf -> IO ()
+start conf = do
+   initLogging (logFile conf) (logPriority conf)
 
    logM NOTICE "sshtun starting"
-   logTest
 
    shared <- atomically $ newTVar (Stopped, Stop)
    _ <- forkIO $ tunnelStart conf shared

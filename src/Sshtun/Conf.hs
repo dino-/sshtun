@@ -2,17 +2,18 @@
 -- License: BSD3 (see LICENSE)
 -- Author: Dino Morelli <dino@ui3.info>
 
+{-# LANGUAGE FlexibleContexts #-} 
+
 {- |
    Simple module for loading config files
 -}
 module Sshtun.Conf
-   ( ConfMap, parseToMap
-   , confString
-   , confInt
-   , confPri
+   ( Conf (..)
+   , parseConf
    )
    where
 
+import Control.Monad.Error
 import Data.Map hiding ( map )
 import Data.Maybe ( catMaybes )
 import Prelude hiding ( lookup )
@@ -21,6 +22,107 @@ import Text.Regex ( matchRegex, mkRegex )
 
 
 type ConfMap = Map String String
+
+data Conf = Conf
+   { logFile :: String
+   , logPriority :: Priority
+   , switchUrl :: String
+   , switchPollInterval :: Int
+   , sshPort :: Int
+   , localPort :: Int
+   , remotePort :: Int
+   , remoteUser :: String
+   , remoteHost :: String
+   , tunnelRetryDelay :: Int
+   }
+   deriving Show
+
+emptyConf :: Conf
+emptyConf = Conf
+   { logFile = ""
+   , logPriority = DEBUG
+   , switchUrl = ""
+   , switchPollInterval = 0
+   , sshPort = 0
+   , localPort = 0
+   , remotePort = 0
+   , remoteUser = ""
+   , remoteHost = ""
+   , tunnelRetryDelay = 0
+   }
+
+
+extractConfItem :: MonadError String m =>
+   ConfMap -> (String, String -> m b) -> m b
+extractConfItem cm (k, f) =
+   maybe (throwError $ "Missing config field: " ++ k)
+      f $ lookup k cm
+
+
+parseConf :: Monad m => String -> m (Either String Conf)
+parseConf entireConf = runErrorT $ do
+   mutatorActions <- mapM (extractConfItem cm) exts
+   foldM (\c f -> f c) emptyConf mutatorActions
+
+   where
+      cm = parseToMap entireConf
+
+      exts =
+         [ ( "logFile"
+           , (\s -> return (\c -> return $ c { logFile = s }))
+           )
+         , ( "logPriority"
+           , (\s -> return (\c -> do
+               p <- strToPriority s
+               return $ c { logPriority = p }
+               ))
+           )
+         , ( "switchUrl"
+           , (\s -> return (\c -> return $ c { switchUrl = s }))
+           )
+         , ( "switchPollInterval"
+           , (\s -> return (\c -> do
+               n <- readE ("switchPollInterval, unable to parse: " ++ s) s
+               return $ c { switchPollInterval = n }
+               ))
+           )
+         , ( "sshPort"
+           , (\s -> return (\c -> do
+               n <- readE ("sshPort, unable to parse: " ++ s) s
+               return $ c { sshPort = n }
+               ))
+           )
+         , ( "localPort"
+           , (\s -> return (\c -> do
+               n <- readE ("localPort, unable to parse: " ++ s) s
+               return $ c { localPort = n }
+               ))
+           )
+         , ( "remotePort"
+           , (\s -> return (\c -> do
+               n <- readE ("remotePort, unable to parse: " ++ s) s
+               return $ c { remotePort = n }
+               ))
+           )
+         , ( "remoteUser"
+           , (\s -> return (\c -> return $ c { remoteUser = s }))
+           )
+         , ( "remoteHost"
+           , (\s -> return (\c -> return $ c { remoteHost = s }))
+           )
+         , ( "tunnelRetryDelay"
+           , (\s -> return (\c -> do
+               n <- readE ("tunnelRetryDelay, unable to parse: " ++ s) s
+               return $ c { tunnelRetryDelay = n }
+               ))
+           )
+         ]
+
+
+readE :: (MonadError e m, Read a) => e -> String -> m a
+readE msg s = case reads s of
+   ((x, ""):[]) -> return x
+   _            -> throwError msg
 
 
 {- |
@@ -55,20 +157,7 @@ parseToMap entireConf =
       re = mkRegex "^([^#][^=]*)=?(.*)"
 
 
-confString :: String -> ConfMap -> IO String
-confString k m = maybe (error $ "Missing config field: " ++ k)
-   return $ lookup k m
-
-
-confInt :: String -> ConfMap -> IO Int
-confInt k m = fmap read $ confString k m
-
-
-confPri :: String -> ConfMap -> IO Priority
-confPri k m = confString k m >>= strToPriority
-
-
-strToPriority :: String -> IO Priority
+strToPriority :: MonadError String m => String -> m Priority
 strToPriority "DEBUG"     = return DEBUG
 strToPriority "INFO"      = return INFO
 strToPriority "NOTICE"    = return NOTICE
@@ -77,4 +166,4 @@ strToPriority "ERROR"     = return ERROR
 strToPriority "CRITICAL"  = return CRITICAL
 strToPriority "ALERT"     = return ALERT
 strToPriority "EMERGENCY" = return EMERGENCY
-strToPriority x           = error $ "Invalid logPriority: " ++ x
+strToPriority x           = throwError $ "Invalid logPriority: " ++ x

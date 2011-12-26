@@ -19,14 +19,14 @@ import Sshtun.Log
 {- This is an ugly hack to delay things until after switchWatcher 
    reads the flag status
 -}
-tunnelStart :: ConfMap -> TVar Shared -> IO ()
+tunnelStart :: Conf -> TVar Shared -> IO ()
 tunnelStart c s = sleep 5 >> tunnelManager c s
 
 
 {- This is the tunnel managing loop, tries to keep it running,
    if desired
 -}
-tunnelManager :: ConfMap -> TVar Shared -> IO ()
+tunnelManager :: Conf -> TVar Shared -> IO ()
 tunnelManager conf shared = do
    logM DEBUG "tunnelManager entered"
 
@@ -36,16 +36,10 @@ tunnelManager conf shared = do
       (Stopped, Run) -> do
          -- Tunnel is stopped, but we'd like it to be started
 
-         -- Get various values from conf for the tunnel
-         sshPort <- confInt "sshPort" conf
-         remotePort <- confInt "remotePort" conf
-         localPort <- confInt "localPort" conf
-         remoteUser <- confString "remoteUser" conf
-         remoteHost <- confString "remoteHost" conf
-
          logM INFO "Starting tunnel now"
          ph <- runCommand $ printf "ssh -p %d -N -R %d:localhost:%d %s@%s"
-            sshPort remotePort localPort remoteUser remoteHost
+            (sshPort conf) (remotePort conf) (localPort conf)
+            (remoteUser conf) (remoteHost conf)
          atomically $ writeTVar shared (Running ph, Run)
 
          -- Then, we wait. Possibly for a long time
@@ -58,5 +52,5 @@ tunnelManager conf shared = do
          atomically $ writeTVar shared (Stopped, dst)
       _ -> return ()
 
-   confInt "tunnelRetryDelay" conf >>= sleep
+   sleep $ tunnelRetryDelay conf
    tunnelManager conf shared

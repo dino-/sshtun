@@ -16,14 +16,13 @@ import Sshtun.Conf
 import Sshtun.Log
 
 
-switchWatcher :: ConfMap -> TVar Shared -> IO ()
+switchWatcher :: Conf -> TVar Shared -> IO ()
 switchWatcher conf shared = do
-   flagUrl <- confString "switchUrl" conf
-   body <- curlGetString flagUrl []
+   body <- curlGetString (switchUrl conf) []
    switch shared $ bodyToState body
 
    logM INFO "switchWatcher starting to wait now"
-   confInt "switchPollInterval" conf >>= sleep
+   sleep $ switchPollInterval conf
    logM INFO "switchWatcher done waiting"
    switchWatcher conf shared
 
