@@ -33,6 +33,7 @@ data Conf = Conf
    , remotePort :: Int
    , remoteUser :: String
    , remoteHost :: String
+   , addlSshArgs :: String
    , tunnelRetryDelay :: Int
    }
    deriving Show
@@ -48,6 +49,7 @@ emptyConf = Conf
    , remotePort = 0
    , remoteUser = ""
    , remoteHost = ""
+   , addlSshArgs = ""
    , tunnelRetryDelay = 0
    }
 
@@ -109,6 +111,9 @@ parseConf entireConf = runErrorT $ do
            )
          , ( "remoteHost"
            , (\s -> return (\c -> return $ c { remoteHost = s }))
+           )
+         , ( "addlSshArgs"
+           , (\s -> return (\c -> return $ c { addlSshArgs = s }))
            )
          , ( "tunnelRetryDelay"
            , (\s -> return (\c -> do

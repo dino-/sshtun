@@ -37,9 +37,9 @@ tunnelManager conf shared = do
          -- Tunnel is stopped, but we'd like it to be started
 
          logM INFO "Starting tunnel now"
-         ph <- runCommand $ printf "ssh -p %d -N -R %d:localhost:%d %s@%s"
+         ph <- runCommand $ printf "ssh -p %d -N -R %d:localhost:%d %s %s@%s"
             (sshPort conf) (remotePort conf) (localPort conf)
-            (remoteUser conf) (remoteHost conf)
+            (addlSshArgs conf) (remoteUser conf) (remoteHost conf)
          atomically $ writeTVar shared (Running ph, Run)
 
          -- Then, we wait. Possibly for a long time
