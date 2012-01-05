@@ -5,7 +5,6 @@
 import Control.Concurrent
 import Control.Concurrent.STM
 import System.Exit
-import System.IO
 
 import Sshtun.Common
 import Sshtun.Conf
@@ -15,11 +14,8 @@ import Sshtun.Tunnel
 
 
 main :: IO ()
-main = do
-   hSetBuffering stdout NoBuffering
-
-   readFile "/etc/sshtun.conf" >>= parseConf >>=
-      either exitFail start
+main = readFile "/etc/sshtun.conf" >>=
+   parseConf >>= either exitFail start
 
 
 exitFail :: String -> IO ()
