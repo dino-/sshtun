@@ -15,9 +15,9 @@ category:            Unknown
 tested-with:         GHC >= 7.0.4
 --extra-source-files:  TEST SUITE FILES
 
---source-repository    head
---   type:             darcs
---   location:         URL
+source-repository    head
+   type:             darcs
+   location:         http://ui3.info/darcs/sshtun
 
 executable           sshtun
    main-is:          main.hs

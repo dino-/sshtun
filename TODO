@@ -4,6 +4,4 @@
 
 - Script for toggling switch on http server
 
-- Put on rcs server, update .cabal
-
 - Better log messages
