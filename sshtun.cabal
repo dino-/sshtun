@@ -12,7 +12,7 @@ stability:           experimental
 synopsis:            Foo
 description:         Bar Baz
 category:            Unknown
-tested-with:         GHC >= 7.0.3
+tested-with:         GHC >= 7.0.4
 --extra-source-files:  TEST SUITE FILES
 
 --source-repository    head
