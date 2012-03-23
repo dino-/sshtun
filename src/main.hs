@@ -22,8 +22,8 @@ main = do
    mapM_ ( \signal -> installHandler signal
       (Catch $ handler shared) Nothing ) [sigINT, sigTERM]
 
-   readFile "/etc/sshtun.conf" >>= parseConf
-      >>= either exitFail (\c -> startDaemon $ sshtunMain c shared)
+   readFile "/etc/sshtun.conf" >>= parseConf >>= either exitFail
+      (\c -> startDaemon (localDaemonUser c) $ sshtunMain c shared)
 
 
 exitFail :: String -> IO ()
@@ -42,11 +42,10 @@ sshtunMain conf shared _ = do
    switchWatcher conf shared
 
 
-startDaemon :: (() -> IO ()) -> IO ()
---startDaemon p = serviced $ simpleDaemon { program = p }
-startDaemon p = serviced $ simpleDaemon
+startDaemon :: String -> (() -> IO ()) -> IO ()
+startDaemon localUser p = serviced $ simpleDaemon
    { program = p
-   , user = Just "dino"
+   , user = Just localUser
    }
 
 

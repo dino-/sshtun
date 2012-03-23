@@ -28,6 +28,7 @@ data Conf = Conf
    , logPriority :: Priority
    , switchUrl :: String
    , switchPollInterval :: Int
+   , localDaemonUser :: String
    , sshPort :: Int
    , localPort :: Int
    , remotePort :: Int
@@ -44,6 +45,7 @@ emptyConf = Conf
    , logPriority = DEBUG
    , switchUrl = ""
    , switchPollInterval = 0
+   , localDaemonUser = ""
    , sshPort = 0
    , localPort = 0
    , remotePort = 0
@@ -87,6 +89,9 @@ parseConf entireConf = runErrorT $ do
                n <- readE ("switchPollInterval, unable to parse: " ++ s) s
                return $ c { switchPollInterval = n }
                ))
+           )
+         , ( "localDaemonUser"
+           , (\s -> return (\c -> return $ c { localDaemonUser = s }))
            )
          , ( "sshPort"
            , (\s -> return (\c -> do
