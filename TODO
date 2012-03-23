@@ -1,3 +1,5 @@
+- main startDaemon: fix hard-coded local user for when root privs are dropped
+
 - Proper installation, including /etc/sshtun.conf
 
 - Make Debian installer
