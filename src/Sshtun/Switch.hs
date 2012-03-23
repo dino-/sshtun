@@ -9,7 +9,6 @@ module Sshtun.Switch
 
 import Control.Concurrent.STM
 import Network.Curl
-import System.Process
 
 import Sshtun.Common
 import Sshtun.Conf
@@ -36,19 +35,8 @@ switch :: TVar Shared -> DesiredState -> IO ()
 
 switch shared Run = do
    logM INFO "switch setting Run now"
-   atomically $ do
-      (tst, _) <- readTVar shared
-      writeTVar shared (tst, Run)
+   run shared
 
 switch shared Stop = do
    logM INFO "switch setting Stop now"
-   tst <- atomically $ do
-      (tst, _) <- readTVar shared
-      writeTVar shared (Stopped, Stop)
-      return tst
-   stop tst
-            
-
-stop :: TunnelState -> IO ()
-stop (Running ph) = terminateProcess ph
-stop Stopped      = return ()
+   stop shared

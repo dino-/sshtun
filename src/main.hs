@@ -5,6 +5,8 @@
 import Control.Concurrent
 import Control.Concurrent.STM
 import System.Exit
+import System.Posix.Daemonize (CreateDaemon(..), serviced, simpleDaemon)
+import System.Posix.Signals
 
 import Sshtun.Common
 import Sshtun.Conf
@@ -14,8 +16,14 @@ import Sshtun.Tunnel
 
 
 main :: IO ()
-main = readFile "/etc/sshtun.conf" >>=
-   parseConf >>= either exitFail start
+main = do
+   shared <- atomically $ newTVar (Stopped, Stop)
+
+   mapM_ ( \signal -> installHandler signal
+      (Catch $ handler shared) Nothing ) [sigINT, sigTERM]
+
+   readFile "/etc/sshtun.conf" >>= parseConf
+      >>= either exitFail (\c -> startDaemon $ sshtunMain c shared)
 
 
 exitFail :: String -> IO ()
@@ -24,14 +32,25 @@ exitFail msg = do
    exitWith $ ExitFailure 1
 
 
-start :: Conf -> IO ()
-start conf = do
+sshtunMain :: Conf -> TVar Shared -> () -> IO ()
+sshtunMain conf shared _ = do
    initLogging (logFile conf) (logPriority conf)
 
    logM NOTICE "sshtun starting"
 
-   shared <- atomically $ newTVar (Stopped, Stop)
    _ <- forkIO $ tunnelStart conf shared
    switchWatcher conf shared
 
+
+startDaemon :: (() -> IO ()) -> IO ()
+--startDaemon p = serviced $ simpleDaemon { program = p }
+startDaemon p = serviced $ simpleDaemon
+   { program = p
+   , user = Just "dino"
+   }
+
+
+handler :: TVar Shared -> IO ()
+handler shared = do
    logM NOTICE "sshtun stopping"
+   stop shared

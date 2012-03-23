@@ -22,8 +22,8 @@ source-repository    head
 executable           sshtun
    main-is:          main.hs
    hs-source-dirs:   src
-   build-depends:    base >= 3 && < 5, containers, curl, hslogger, mtl,
-                     process, regex-compat, stm
+   build-depends:    base >= 3 && < 5, containers, curl, hdaemonize,
+                     hslogger, mtl, process, regex-compat, stm, unix
    ghc-options:      -Wall -threaded
 
 --test-suite           pristine-tests
