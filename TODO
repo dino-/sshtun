@@ -1,9 +1,5 @@
-- Proper installation, including /etc/sshtun.conf
-
-- Make Debian installer
-
 - Script for toggling switch on http server
 
 - Note in conf about 'GatewayPorts yes'
 
-- Better help if the daemon is started with no conf file present in /etc/
+- Clean up cabal file

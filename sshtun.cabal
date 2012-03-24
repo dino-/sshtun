@@ -13,6 +13,12 @@ synopsis:            Foo
 description:         Bar Baz
 category:            Unknown
 tested-with:         GHC >= 7.0.4
+
+data-dir:            resources
+data-files:          INSTALL
+                     sshtun.conf
+--                     sshtun.logrotate
+
 --extra-source-files:  TEST SUITE FILES
 
 source-repository    head
@@ -22,8 +28,9 @@ source-repository    head
 executable           sshtun
    main-is:          main.hs
    hs-source-dirs:   src
-   build-depends:    base >= 3 && < 5, containers, curl, hdaemonize,
-                     hslogger, mtl, process, regex-compat, stm, unix
+   build-depends:    base >= 3 && < 5, containers, curl, directory,
+                     hdaemonize, hslogger, mtl, process, regex-compat,
+                     stm, unix
    ghc-options:      -Wall -threaded
 
 --test-suite           pristine-tests

@@ -4,10 +4,14 @@
 
 import Control.Concurrent
 import Control.Concurrent.STM
+import Control.Monad
+import System.Directory
 import System.Exit
 import System.Posix.Daemonize (CreateDaemon(..), serviced, simpleDaemon)
 import System.Posix.Signals
+import System.Posix.User
 
+import Paths_sshtun
 import Sshtun.Common
 import Sshtun.Conf
 import Sshtun.Log
@@ -15,14 +19,20 @@ import Sshtun.Switch
 import Sshtun.Tunnel
 
 
+confPath :: FilePath
+confPath = "/etc/sshtun.conf"
+
+
 main :: IO ()
 main = do
+   checkEnv
+
    shared <- atomically $ newTVar (Stopped, Stop)
 
    mapM_ ( \signal -> installHandler signal
       (Catch $ handler shared) Nothing ) [sigINT, sigTERM]
 
-   readFile "/etc/sshtun.conf" >>= parseConf >>= either exitFail
+   readFile confPath >>= parseConf >>= either exitFail
       (\c -> startDaemon (localDaemonUser c) $ sshtunMain c shared)
 
 
@@ -53,3 +63,22 @@ handler :: TVar Shared -> IO ()
 handler shared = do
    logM NOTICE "sshtun stopping"
    stop shared
+
+
+checkEnv :: IO ()
+checkEnv = do
+   -- root user check
+   euid <- getEffectiveUserID
+   when (euid /= 0) $
+      exitFail "This service must be run by the root user"
+
+   -- conf file check
+   doesFileExist confPath >>= (flip unless $ do
+      instDocPath <- getDataFileName "INSTALL"
+      let msg = init . unlines $
+            [ "Unable to find conf file at " ++ confPath
+            , "This could mean sshtun isn't installed fully"
+            , "Please see " ++ instDocPath ++ " to complete installation"
+            ]
+      exitFail msg
+      )
