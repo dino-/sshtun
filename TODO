@@ -1,5 +1,5 @@
-- Script for toggling switch on http server
+- Write INSTALL document
 
-- Note in conf about 'GatewayPorts yes'
+- Script for toggling switch on http server
 
 - Clean up cabal file
