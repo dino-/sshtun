@@ -19,8 +19,6 @@ data-files:          INSTALL
                      sshtun.conf
 --                     sshtun.logrotate
 
---extra-source-files:  TEST SUITE FILES
-
 source-repository    head
    type:             darcs
    location:         http://ui3.info/darcs/sshtun
@@ -32,10 +30,3 @@ executable           sshtun
                      hdaemonize, hslogger, mtl, process, regex-compat,
                      stm, unix
    ghc-options:      -Wall -threaded
-
---test-suite           pristine-tests
---   type:             exitcode-stdio-1.0
---   main-is:          pristine-tests.hs
---   build-depends:    base
---   hs-source-dirs:   src testsuite
---   ghc-options:      -Wall
