@@ -28,15 +28,13 @@ tunnelStart c s = sleep 5 >> tunnelManager c s
 -}
 tunnelManager :: Conf -> TVar Shared -> IO ()
 tunnelManager conf shared = do
-   logM DEBUG "tunnelManager entered"
-
    state <- atomically . readTVar $ shared
 
    case state of
       (Stopped, Run) -> do
          -- Tunnel is stopped, but we'd like it to be started
 
-         logM INFO "Starting tunnel now"
+         logM INFO "Tunnel manager starting tunnel"
          ph <- runCommand $ printf "ssh -p %d -N -R %d:localhost:%d %s %s@%s"
             (sshPort conf) (remotePort conf) (localPort conf)
             (addlSshArgs conf) (remoteUser conf) (remoteHost conf)
@@ -46,7 +44,7 @@ tunnelManager conf shared = do
          _ <- waitForProcess ph
 
          -- Tunnel has (possibly unexpectedly) stopped, make a note of this
-         logM INFO "tunnelManager unblocked"
+         logM INFO "Tunnel manager unblocked"
          -- Read this again, may have changed during long wait
          (_, dst) <- atomically . readTVar $ shared
          atomically $ writeTVar shared (Stopped, dst)

@@ -20,9 +20,9 @@ switchWatcher conf shared = do
    body <- curlGetString (switchUrl conf) []
    switch shared $ bodyToState body
 
-   logM INFO "switchWatcher starting to wait now"
+   logM INFO "Switch watcher starting to wait"
    sleep $ switchPollInterval conf
-   logM INFO "switchWatcher done waiting"
+   logM INFO "Switch watcher done waiting"
    switchWatcher conf shared
 
 
@@ -34,9 +34,9 @@ bodyToState _               = Stop
 switch :: TVar Shared -> DesiredState -> IO ()
 
 switch shared Run = do
-   logM INFO "switch setting Run now"
+   logM INFO "Switch watcher setting desired state to Run"
    run shared
 
 switch shared Stop = do
-   logM INFO "switch setting Stop now"
+   logM INFO "Switch watcher setting desired state to Stop"
    stop shared
