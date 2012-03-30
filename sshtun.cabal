@@ -15,7 +15,7 @@ category:            Unknown
 tested-with:         GHC >= 7.0.4
 
 data-dir:            resources
-data-files:          INSTALL
+data-files:          README
                      sshtun.conf
                      logrotate.d/sshtun
 

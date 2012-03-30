@@ -74,7 +74,7 @@ checkEnv = do
 
    -- conf file check
    doesFileExist confPath >>= (flip unless $ do
-      instDocPath <- getDataFileName "INSTALL"
+      instDocPath <- getDataFileName "README"
       let msg = init . unlines $
             [ "Unable to find conf file at " ++ confPath
             , "This could mean sshtun isn't installed fully"
