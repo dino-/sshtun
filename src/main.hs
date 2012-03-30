@@ -6,10 +6,12 @@ import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Monad
 import System.Directory
+import System.Environment
 import System.Exit
 import System.Posix.Daemonize (CreateDaemon(..), serviced, simpleDaemon)
 import System.Posix.Signals
 import System.Posix.User
+import Text.Printf
 
 import Paths_sshtun
 import Sshtun.Common
@@ -38,7 +40,9 @@ main = do
 
 exitFail :: String -> IO ()
 exitFail msg = do
-   putStrLn msg
+   instDocPath <- getDataFileName "README"
+   _ <- printf "%s\n\nPlease see %s\n" msg instDocPath
+
    exitWith $ ExitFailure 1
 
 
@@ -74,11 +78,16 @@ checkEnv = do
 
    -- conf file check
    doesFileExist confPath >>= (flip unless $ do
-      instDocPath <- getDataFileName "README"
       let msg = init . unlines $
             [ "Unable to find conf file at " ++ confPath
             , "This could mean sshtun isn't installed fully"
-            , "Please see " ++ instDocPath ++ " to complete installation"
             ]
       exitFail msg
       )
+
+   -- args check
+   args <- getArgs
+   when (
+      (not $ null args) &&
+      (not $ head args `elem` ["start", "stop", "restart"])
+      ) $ exitFail "usage: sshtun {start|stop|restart}"
