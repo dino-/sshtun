@@ -1,1 +1,59 @@
-installation documentation to be written
+WHAT IS SSHTUN?
+
+We all know the value of ssh for secure remote shell activities and other tools like scp and sftp. Another powerful thing ssh can do is construct secure tunnels between IP addresses and ports. It can be used like a vpn.
+
+As an example, say you have a computer on a network that's difficult to gain access to from the outside. But within that network you are able to ssh out to anywhere you like. With another system outside the network set up, ssh can maintain an encrypted tunnel between the two systems so that access can be gained back through the tunnel from the outside system to the 'hidden' one.
+
+This is done with a command similar to this:
+
+   ssh -p 22 -N -R 22:localhost:2022 OUTSIDEUSER@OUTSIDEHOST
+
+This command will not create an interactive shell, but will instead block while this tunnel is open.
+
+One complication with this is failure of the tunnel for some reason, leaving no access to the inside system to restart it. This is the purpose of sshtun.
+
+sshtun is a daemon that executes the ssh command and blocks on it. If the tunnel is closed, sshtun will attempt to reestablish it.
+
+Optionally, sshtun can be instructed to keep the tunnel open or closed via a file at an http URL, a switch file. The daemon will poll this file periodically via http, allowing you to control the tunnel from the outside and start it when you need it.
+
+
+CONFIGURING SSHTUN
+
+First, it's necessary to be able to passwordless ssh from a user (not root) on the inside system to a user on the outside system. You will need to use ssh-keygen and adjust outside's authorized_keys. Please see ssh(1) for more information on how to configure this.
+
+And bear in mind that this will allow unattended shell access, so plan accordingly. Not a bad idea to have an sshtun user on the outside system who has no real power on that system.
+
+If you can perform an ssh tunnel command as above yourself from the shell, than you have things ready to be able to configure sshtun.
+
+
+Next, you need to edit an sshtun.conf file and place it in /etc/ on the inside system. You can find a heavily-documented example of this file in the same directory that this README is in. This file contains all of the relevant information to execute the ssh tunnel command and also contains settings for polling intervals, the switch http location, etc.
+
+
+sshtun defaults to /var/log/sshtun.log for logging. If you're going to be using it a lot, this log file will get big. Some systems have logrotate installed to manage log files, rotate, compress, and delete old logs. In the same directory that this README is in, I have included logrotate.d/sshtun. You can place this file in /etc/logrotate.d/ to manage the log.
+
+
+Although not necessary, you may want to install this software as a system daemon in /etc/init.d/ or /etc/rc.d/, whatever is appropriate for your operating system. In this case, all that's necessary is to put a link to the sshtun binary in the directory where other daemons are. sshtun drops right into this environment and responds to the same set of start/stop/restart commands that other daemons do.
+
+
+USAGE
+
+Once you have sshtun configured, it must be run as root like this:
+
+   # sshtun start
+
+You should then be able to see status information in the log file (defaults to /var/log/sshtun.log) and use your tunnel.
+
+Other commands are "stop" and "restart"
+
+
+PROBLEMS AND FUTURE DEVELOPMENT
+
+Only one sshtun instance can be running on a system. There's no real reason for this other than that's how it works at this time. It could be changed if there's interest among the userbase for multiple, simultaneous named tunnels.
+
+If you are using the http switch facility, and the switch file becomes unavailable when the inside system polls for it, this is taken to mean that the tunnel should be shut down immediately. Even though this may be extreme, it seemed like the safest default to use for the moment. Again, we can change this if anyone has special needs or better ideas.
+
+
+CONTACT
+
+Project page:  http://ui3.info/d/proj/sshtun.html
+Email developer: Dino Morelli  dino@ui3.info
