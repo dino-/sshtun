@@ -8,6 +8,7 @@ module Sshtun.Switch
    where
 
 import Control.Concurrent.STM
+import Data.Maybe
 import Network.Curl
 import Text.Printf
 
@@ -18,7 +19,7 @@ import Sshtun.Log
 
 switchWatcher :: Conf -> TVar Shared -> IO ()
 switchWatcher conf shared = do
-   response <- curlGetString (switchUrl conf) []
+   response <- curlGetString (fromJust . switchUrl $ conf) []
    switch shared =<< respToState response
 
    logM INFO "Switch watcher starting to wait"

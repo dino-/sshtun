@@ -5,6 +5,7 @@
 import Control.Concurrent
 import Control.Concurrent.STM
 import Control.Monad
+import Data.Maybe
 import System.Directory
 import System.Environment
 import System.Exit
@@ -52,8 +53,15 @@ sshtunMain conf shared _ = do
 
    logM NOTICE "sshtun starting"
 
-   _ <- forkIO $ tunnelStart conf shared
-   switchWatcher conf shared
+   -- Only start the Switch Watcher thread if the user has configured
+   -- it, otherwise, we run all the time
+   if (isJust . switchUrl $ conf)
+      then do
+         _ <- forkIO $ switchWatcher conf shared
+         return ()
+      else run shared
+
+   tunnelStart conf shared
 
 
 startDaemon :: String -> (() -> IO ()) -> IO ()

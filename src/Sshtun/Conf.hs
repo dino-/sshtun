@@ -26,7 +26,7 @@ type ConfMap = Map String String
 data Conf = Conf
    { logFile :: String
    , logPriority :: Priority
-   , switchUrl :: String
+   , switchUrl :: Maybe String
    , switchPollInterval :: Int
    , localDaemonUser :: String
    , sshPort :: Int
@@ -43,7 +43,7 @@ emptyConf :: Conf
 emptyConf = Conf
    { logFile = ""
    , logPriority = DEBUG
-   , switchUrl = ""
+   , switchUrl = Nothing
    , switchPollInterval = 0
    , localDaemonUser = ""
    , sshPort = 0
@@ -82,7 +82,8 @@ parseConf entireConf = runErrorT $ do
                ))
            )
          , ( "switchUrl"
-           , (\s -> return (\c -> return $ c { switchUrl = s }))
+           , (\s -> return (\c ->
+               return $ c { switchUrl = parseSwitchUrl s }))
            )
          , ( "switchPollInterval"
            , (\s -> return (\c -> do
@@ -127,6 +128,11 @@ parseConf entireConf = runErrorT $ do
                ))
            )
          ]
+
+
+parseSwitchUrl :: String -> Maybe String
+parseSwitchUrl "" = Nothing
+parseSwitchUrl s  = Just s
 
 
 readE :: (MonadError e m, Read a) => e -> String -> m a
