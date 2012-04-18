@@ -9,6 +9,7 @@ module Sshtun.Switch
 
 import Control.Concurrent.STM
 import Network.Curl
+import Text.Printf
 
 import Sshtun.Common
 import Sshtun.Conf
@@ -17,8 +18,8 @@ import Sshtun.Log
 
 switchWatcher :: Conf -> TVar Shared -> IO ()
 switchWatcher conf shared = do
-   body <- curlGetString (switchUrl conf) []
-   switch shared $ bodyToState body
+   response <- curlGetString (switchUrl conf) []
+   switch shared =<< respToState response
 
    logM INFO "Switch watcher starting to wait"
    sleep $ switchPollInterval conf
@@ -26,9 +27,12 @@ switchWatcher conf shared = do
    switchWatcher conf shared
 
 
-bodyToState :: (CurlCode, String) -> DesiredState
-bodyToState (CurlOK, "1\n") = Run
-bodyToState _               = Stop
+respToState :: (CurlCode, String) -> IO DesiredState
+respToState (CurlOK, "1\n") = return Run
+respToState (CurlOK, "0\n") = return Stop
+respToState (code,   _    ) = do
+   logM ERROR $ printf "Problem reading switch file: %s" (show code)
+   return Stop
 
 
 switch :: TVar Shared -> DesiredState -> IO ()
