@@ -11,7 +11,7 @@ stability:           experimental
 homepage:            http://ui3.info/d/proj/sshtun.html
 synopsis:            Foo
 description:         Bar Baz
-category:            Unknown
+category:            Application, Network
 tested-with:         GHC >= 7.0.4
 
 data-dir:            resources
