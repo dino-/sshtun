@@ -45,6 +45,8 @@ You should then be able to see status information in the log file (defaults to /
 
 Other commands are "stop" and "restart"
 
+If you are using the switch file over http facility, there's a script called sshtun-switch.sh, in the same directory as this README, for turning the desired state on and off. It's to be deployed to that system.
+
 
 PROBLEMS AND FUTURE DEVELOPMENT
 
