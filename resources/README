@@ -45,12 +45,12 @@ You should then be able to see status information in the log file (defaults to /
 
 Other commands are "stop" and "restart"
 
-If you are using the switch file over http facility, there's a script called sshtun-switch.sh, in the same directory as this README, for turning the desired state on and off. It's to be deployed to that system.
+If you are using the switch file over http facility, there's a script called sshtun-switch.sh, in the same directory as this README, for turning the desired state on and off. The idea is you have a system with an http server running. The machine who wants to keep the tunnel open (or not) can make http requests to it to examine the expected state, up or down. The sshtun-switch.sh script is intended to be deployed to the system where the http server is running, and is used manually to switch the desired state.
 
 
 PROBLEMS AND FUTURE DEVELOPMENT
 
-Only one sshtun instance can be running on a system. There's no real reason for this other than that's how it works at this time. It could be changed if there's interest among the userbase for multiple, simultaneous named tunnels.
+Only one sshtun instance can be running on a system. There's no real reason for this other than that's how it works at this time. It could be changed if there's interest among the userbase for multiple, simultaneous, named tunnels.
 
 If you are using the http switch facility, and the switch file becomes unavailable when the inside system polls for it, this is taken to mean that the tunnel should be shut down immediately. Even though this may be extreme, it seemed like the safest default to use for the moment. Again, we can change this if anyone has special needs or better ideas.
 
