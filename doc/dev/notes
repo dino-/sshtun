@@ -1,0 +1,19 @@
+a word on the version numbering scheme
+
+The idea here is to start at 1.0.0, NOT < 1. So the very first "alpha" release of any kind that's ever worked on is 1.0 or 1.0.0 or 1.0.0.0
+
+I know what you're saying: "But that's not right, we've never done it that way." I know, but let's go over this:
+
+So you've started working on your project. You start numbering it 0.0.1 to signify its alpha-level development status. Great.
+
+You work along, yada yada, it goes through 0.0.2 to 0.1.0 and so forth until you get real close to unleashing your creation on Real Users, at 0.9.3. So far, so good.
+
+Then, the fateful day arrives, you cut the ribbon and number it 1.0.0. There is much rejoicing. At least until the bugs come in. So you start moving that version number up with the fixes: 1.0.1, 1.1.3, etc..
+
+Now, you're working on the features for the big 2.x.x version. How do you version number the pre-2.x.x releases? 1.2.0? 1.9.0? Observe how these don't look different than bug-fix released in the 1.x.x project. How do you tell them apart without docs? You can't, really.
+
+And that right there is what made me break with tradition.
+
+So, the new way: Everything related to 1.x.x starts with 1.0.0 and goes upwards. No lower numbers. When work starts on 2.x features, start with 2.0.0 and go forward. Do not contaminate the 1.x version numbers with 2.x's work.
+
+So when you get something from me that's 1.0.0 or some such low number, it's early on in its release. That's that.
