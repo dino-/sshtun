@@ -26,8 +26,13 @@ source-repository    head
 
 executable           sshtun
    main-is:          main.hs
-   hs-source-dirs:   src
    build-depends:    base >= 3 && < 5, containers, curl, directory,
                      hdaemonize, hslogger, mtl, process, regex-compat,
                      stm, unix
+   hs-source-dirs:   src
+   other-modules:    Sshtun.Common
+                     Sshtun.Conf
+                     Sshtun.Log
+                     Sshtun.Switch
+                     Sshtun.Tunnel
    ghc-options:      -Wall -threaded
