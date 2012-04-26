@@ -12,7 +12,7 @@ homepage:            http://ui3.info/d/proj/sshtun.html
 synopsis:            Foo
 description:         Bar Baz
 category:            Application, Network
-tested-with:         GHC >= 7.0.4
+tested-with:         GHC >= 7.0.3
 
 data-dir:            resources
 data-files:          README
