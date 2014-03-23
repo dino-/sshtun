@@ -20,6 +20,8 @@ script](http://ui3.info/darcs/scripts/sshtun) I wrote. The switching
 behavior together with blocking on the tunnel requires separate
 threads and so I attacked the problem with Haskell.
 
+For usage information and more details, see the project's [README file](http://ui3.info/darcs/sshtun/resources/README)
+
 
 ## Getting source
 
