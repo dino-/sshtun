@@ -22,7 +22,7 @@ data-files:          README
 
 source-repository    head
    type:             darcs
-   location:         http://ui3.info/darcs/sshtun
+   location:         http://hub.darcs.net/dino/sshtun
 
 executable           sshtun
    main-is:          main.hs
