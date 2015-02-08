@@ -32,9 +32,9 @@ For usage information and more details, see the project's [README file](http://h
 
 And once you have it, building the usual way:
 
->     $ cabal configure
->     $ cabal build
->     $ cabal install
+    $ cabal configure
+    $ cabal build
+    $ cabal install
 
 
 ## Installing
