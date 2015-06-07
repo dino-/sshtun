@@ -26,7 +26,6 @@ For usage information and more details, see the project's [README file](http://h
 ## Getting source
 
 - Download the cabalized source package [from Hackage](http://hackage.haskell.org/package/sshtun)
-- Download the cabalized source tarball [from here](http://ui3.info/d/proj/sshtun/sshtun-1.0.0.tar.gz)
 - Get the source with darcs: `$ darcs get http://hub.darcs.net/dino/sshtun`
 - If you're just looking, [browse the source](http://hub.darcs.net/dino/sshtun)
 
