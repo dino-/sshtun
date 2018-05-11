@@ -14,11 +14,11 @@ attempt to reestablish it. It can also be set up to monitor a file
 on an http server to determine if the tunnel should be up or not,
 so you can switch it on or off remotely.
 
-It's this last behavior, the switching on and off remotely,
-that makes this project differ from the [simpler sshtun shell
-script](https://github.com/dino-/scripts/sshtun) I wrote. The switching
-behavior together with blocking on the tunnel requires separate threads and so
-I attacked the problem with Haskell.
+It's this last behavior, the switching on and off remotely, that makes this
+project differ from the [simpler sshtun shell
+script](https://github.com/dino-/scripts/blob/master/sshtun) I wrote. The
+switching behavior together with blocking on the tunnel requires separate
+threads and so I attacked the problem with Haskell.
 
 
 ## Getting source
