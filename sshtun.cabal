@@ -19,6 +19,7 @@ data-files:          README
                      sshtun.conf
                      sshtun-switch.sh
                      logrotate.d/sshtun
+                     stack.yaml
 
 source-repository    head
    type:             git
@@ -30,7 +31,8 @@ executable           sshtun
                      hdaemonize, hslogger, mtl, process, regex-compat,
                      stm, unix
    hs-source-dirs:   src
-   other-modules:    Sshtun.Common
+   other-modules:    Paths_sshtun
+                     Sshtun.Common
                      Sshtun.Conf
                      Sshtun.Log
                      Sshtun.Switch
