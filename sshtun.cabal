@@ -8,7 +8,7 @@ copyright:           2012 Dino Morelli
 author:              Dino Morelli
 maintainer:          Dino Morelli <dino@ui3.info>
 stability:           experimental
-homepage:            http://hub.darcs.net/dino/sshtun
+homepage:            https://github.com/dino-/sshtun
 synopsis:            Wrapper daemon to manage an ssh tunnel
 description:         This is a daemon that executes an ssh command to form a secure tunnel and then blocks on it. If the tunnel goes down, sshtun will attempt to reestablish it. It can also be set up to monitor a file on an http server to determine if the tunnel should be up or not, so you can switch it on or off remotely.
 category:            Application, Network
@@ -21,8 +21,8 @@ data-files:          README
                      logrotate.d/sshtun
 
 source-repository    head
-   type:             darcs
-   location:         http://hub.darcs.net/dino/sshtun
+   type:             git
+   location:         https://github.com/dino-/sshtun.git
 
 executable           sshtun
    main-is:          main.hs
